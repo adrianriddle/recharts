@@ -3,9 +3,9 @@
 
 'use strict';
 
-var path = require('path');
+const path = require('path');
 
-module.exports = function (config) {
+module.exports = function config(config) {
 
   config.set({
     singleRun: !!process.env.RELEASE,
@@ -41,15 +41,22 @@ module.exports = function (config) {
         noParse: [
           /node_modules\/sinon\//,
         ],
-        loaders: [{
-          test: /\.js$/,
+        rules: [{
+          test: /\.(js|ts|tsx)$/,
           exclude: [
             path.resolve('node_modules/'),
           ],
-          loader: 'babel-loader'
+          loader: 'babel-loader',
         }, {
+          type: 'javascript/auto',
           test: /\.json$/,
           loader: 'json-loader',
+        }, {
+          test: /\.(ts|tsx)$/,
+          exclude: /node_modules/,
+          use: {
+            loader: 'ts-loader',
+          }
         }],
       },
       externals: {
@@ -65,6 +72,7 @@ module.exports = function (config) {
           sinon: 'sinon/pkg/sinon',
           recharts: path.resolve('src/index.js'),
         },
+        extensions: ['.ts', '.tsx', '.js', '.jsx', '.json'],
       },
     },
     plugins: [

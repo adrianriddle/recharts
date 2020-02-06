@@ -131,6 +131,7 @@ export default class Demo extends Component {
             <Scatter name="A school" data={data01} fill="#ff7300">
               <ErrorBar dataKey="errorY" width={0} strokeWidth={1} stroke="blue" direction="y" />
               <ErrorBar dataKey="errorX" width={4} strokeWidth={2} stroke="green" opacity={0.8} direction="x" />
+              <LabelList dataKey="x" />
             </Scatter>
           </ScatterChart>
         </div>
@@ -158,7 +159,7 @@ export default class Demo extends Component {
             <CartesianGrid />
             <Tooltip cursor={{strokeDasharray: '3 3'}}/>
             <Legend/>
-            <Scatter name='A school' data={data05} legendType="square" fill='#8884d8' shape="square"/>
+            <Scatter line lineType="fitting" name='A school' data={data05} legendType="square" fill='#8884d8' shape="square"/>
           </ScatterChart>
         </div>
 

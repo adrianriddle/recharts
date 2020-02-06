@@ -1,7 +1,6 @@
 const path = require('path');
-const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 const webpack = require('webpack');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 const env = process.env.NODE_ENV;
 
@@ -9,25 +8,43 @@ const config = {
   entry: './src/index.js',
 
   output: {
+    path: path.resolve(__dirname, 'umd'),
     library: 'Recharts',
     libraryTarget: 'umd',
   },
 
   module: {
-    loaders: [{
-      test: /\.(js|jsx)$/,
-      exclude: /node_modules/,
-      include: [
-        path.resolve(__dirname, 'src'),
-      ],
-      loader: 'babel-loader',
-      query: {
-        plugins: ['lodash'],
+    rules: [
+      {
+        test: /\.(js|jsx|ts|tsx)$/,
+        exclude: /node_modules/,
+        include: [
+          path.resolve(__dirname, 'src'),
+        ],
+        use: {
+          loader: 'babel-loader',
+          query: {
+            plugins: ['lodash'],
+          },
+        }
       },
-    }],
+      {
+        test: /\.(ts|tsx)$/,
+        exclude: /node_modules/,
+        include: [
+          path.resolve(__dirname, 'src'),
+        ],
+        use: {
+          loader: 'ts-loader',
+        }
+      }
+    ],
   },
 
-  devtool: 'source-map',
+  devtool: 'inline-source-map',
+  resolve: {
+    extensions: ['.js', '.jsx', '.json', '.ts', '.tsx'],
+  },
 
   externals: {
     react: {
@@ -35,6 +52,12 @@ const config = {
       commonjs2: 'react',
       commonjs: 'react',
       amd: 'react',
+    },
+    'react-dom': {
+      root: 'ReactDOM',
+      commonjs2: 'react-dom',
+      commonjs: 'react-dom',
+      amd: 'react-dom'
     },
     'prop-types': {
       root: 'PropTypes',
@@ -45,10 +68,6 @@ const config = {
   },
 
   plugins: [
-    new LodashModuleReplacementPlugin({
-      collections: true,
-      shorthands: true,
-    }),
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': JSON.stringify(env),
     }),
@@ -61,21 +80,13 @@ if (env === 'analyse') {
   );
 }
 
+if (env === 'development') {
+  config.mode = 'development';
+  config.devtool = 'source-map';
+}
+
 if (env === 'production') {
-  config.plugins.push(
-    new webpack.optimize.UglifyJsPlugin({
-      compressor: {
-        pure_getters: true,
-        unsafe: true,
-        unsafe_comps: true,
-        warnings: false,
-      },
-      output: {
-        comments: false,
-      },
-      sourceMap: false,
-    })
-  );
+  config.mode = 'production';
 }
 
 module.exports = config;
